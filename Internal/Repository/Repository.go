@@ -1,6 +1,12 @@
 package Repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"CSR/Internal/errs"
+	"database/sql"
+	"errors"
+	"github.com/jmoiron/sqlx"
+	"log"
+)
 
 type Repository struct {
 	db *sqlx.DB
@@ -9,5 +15,15 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		db: db,
+	}
+}
+
+func (r *Repository) transferError(err error) error {
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		log.Println(err)
+		return errs.ErrNotFound
+	default:
+		return err
 	}
 }
