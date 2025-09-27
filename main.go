@@ -1,16 +1,21 @@
 package main
 
 import (
-	"CSR/Internal/Controller"
-	"CSR/Internal/Repository"
-	"CSR/Internal/Service"
-	"CSR/Internal/configs"
+	"CSR/internal/configs"
+	"CSR/internal/controller"
+	"CSR/internal/repository"
+	"CSR/internal/service"
+	"context"
 	"fmt"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
+
+var ctx = context.Background()
 
 // @title onlineshop
 // @contact.name onlineshop api
@@ -40,10 +45,15 @@ func main() {
 	}
 
 	log.Println("successfully connected to postgres")
-
-	repository := Repository.NewRepository(db)
-	service := Service.NewService(repository)
-	controller := Controller.NewController(service)
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     configs.AppSettings.RedisParams.Address,
+		Password: os.Getenv("REDIS_PASS"),
+		DB:       configs.AppSettings.RedisParams.DB,
+	})
+	cache := repository.NewCache(rdb)
+	repository := repository.NewRepository(db, cache)
+	service := service.NewService(repository, cache)
+	controller := controller.NewController(service)
 
 	if err = controller.RunServer(); err != nil {
 		log.Fatal(err)

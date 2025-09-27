@@ -1,7 +1,7 @@
-package Repository
+package repository
 
 import (
-	"CSR/Internal/errs"
+	"CSR/internal/errs"
 	"database/sql"
 	"errors"
 	"github.com/jmoiron/sqlx"
@@ -9,12 +9,14 @@ import (
 )
 
 type Repository struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	Cache *Cache
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
+func NewRepository(db *sqlx.DB, cache *Cache) *Repository {
 	return &Repository{
 		db: db,
+		Cache:cache,
 	}
 }
 

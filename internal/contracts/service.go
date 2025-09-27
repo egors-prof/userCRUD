@@ -1,7 +1,7 @@
 package contracts
 
-import "CSR/Internal/models"
-
+import "CSR/internal/models"
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
 type ServiceI interface {
 	GetAllUsers() ([]models.User, error)
 	GetUserById(id int) (models.User, error)

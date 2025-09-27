@@ -1,11 +1,18 @@
-package Service
+package service
 
 import (
-	"CSR/Internal/errs"
-	"CSR/Internal/models"
+	"CSR/internal/errs"
+	"CSR/internal/models"
+	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
+	"time"
+	
 )
-
+var ctx = context.Background()
+var DefaultTTL=3*time.Minute
 func (s *Service) GetAllUsers() ([]models.User, error) {
 	users, err := s.repository.GetAllUsers()
 	if err != nil {
@@ -18,17 +25,32 @@ func (s *Service) GetAllUsers() ([]models.User, error) {
 
 }
 func (s *Service) GetUserById(id int) (models.User, error) {
-	user, err := s.repository.GetUserById(id)
+	redis_id := fmt.Sprintf("user_%d", id)
+	user, err := s.cache.Get(ctx, redis_id)
+
 	if err != nil {
-		if errors.Is(err, errs.ErrUserNotFound) {
+		user, err := s.repository.GetUserById(id)
+		log.Println("service : ", user, err)
+
+		if err != nil {
 			return models.User{}, errs.ErrUserNotFound
 		}
+		s.cache.Set(ctx, redis_id, user,DefaultTTL)
+		log.Printf("user_%d is cached", id)
+		return user, nil
+	}
+	userRes := models.User{}
+	err = json.Unmarshal([]byte(user), &userRes)
+	if err != nil {
 		return models.User{}, err
 	}
-	return user, nil
+	return userRes, nil
 }
 
 func (s *Service) CreateNewUser(user models.User) error {
+	if len(user.Name) < 4 {
+		return errs.ErrInvalidUserName
+	}
 	err := s.repository.CreateNewUser(user)
 	if err != nil {
 		return err

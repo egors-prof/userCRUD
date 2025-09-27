@@ -1,6 +1,6 @@
 package contracts
 
-import "CSR/Internal/models"
+import "CSR/internal/models"
 
 type RepositoryI interface {
 	GetAllUsers() ([]models.User, error)

@@ -11,6 +11,11 @@
     "port": "5432",
     "user": "postgres",
     "database": "postgres"
+  },
+  "redis_params":{
+    "addr":"localhost:6379",
+    "password":"",
+    "db":0
   }
 
 }

@@ -1,8 +1,8 @@
-package Controller
+package controller
 
 import (
-	"CSR/Internal/errs"
-	"CSR/Internal/models"
+	"CSR/internal/errs"
+	"CSR/internal/models"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -56,7 +56,7 @@ func (ctrl *Controller) GetUserById(c *gin.Context) {
 	}
 	user, err := ctrl.service.GetUserById(id)
 	if err != nil {
-		ctrl.handleError(c, errs.ErrInvalidUserID)
+		ctrl.handleError(c, errs.ErrUserNotFound)
 		return
 	}
 	c.JSON(200, user)
