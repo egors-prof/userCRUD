@@ -21,9 +21,9 @@ func (ctrl *Controller) handleError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, errs.ErrUserNotFound) || errors.Is(err, errs.ErrNotFound):
 		c.JSON(http.StatusNotFound, CommonError{Error: err.Error()})
-	case errors.Is(err, errs.ErrInvalidUserID) || errors.Is(err, errs.ErrInvalidRequestBody):
+	case errors.Is(err, errs.ErrInvalidUserID) || errors.Is(err, errs.ErrInvalidRequestBody) || errors.Is(err, errs.ErrNegativeID) || errors.Is(err, errs.ErrInvalidIDFormat):
 		c.JSON(http.StatusBadRequest, CommonError{Error: err.Error()})
-	case errors.Is(err, errs.ErrInvalidFieldValue)||errors.Is(err,errs.ErrInvalidUserName):
+	case errors.Is(err, errs.ErrInvalidFieldValue) || errors.Is(err, errs.ErrInvalidUserName):
 		c.JSON(http.StatusUnprocessableEntity, CommonError{Error: err.Error()})
 
 	default:

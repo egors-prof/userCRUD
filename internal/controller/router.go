@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"CSR/internal/configs"
 	_ "CSR/docs"
+	"CSR/internal/configs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

@@ -143,10 +143,15 @@ func (ctrl *Controller) UpdateUserById(c *gin.Context) {
 func (ctrl *Controller) DeleteUserById(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
-	if err != nil || id < 1 {
-		ctrl.handleError(c, err)
+	if err != nil {
+		ctrl.handleError(c, errs.ErrInvalidIDFormat)
 		return
 	}
+	if id < 1 {
+		ctrl.handleError(c, errs.ErrNegativeID)
+		return
+	}
+
 	err = ctrl.service.DeleteUserById(id)
 	if err != nil {
 		ctrl.handleError(c, errs.ErrInvalidUserID)
