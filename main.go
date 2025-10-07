@@ -2,17 +2,18 @@ package main
 
 import (
 	"CSR/internal/configs"
-	"CSR/internal/controller"
 	"CSR/internal/repository"
 	"CSR/internal/service"
 	"context"
 	"fmt"
-	"log"
+	"CSR/internal/controller"
+
 	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog"
 )
 
 var ctx = context.Background()
@@ -22,12 +23,12 @@ var ctx = context.Background()
 // @contact.url http://test.com
 // @contact.email test@test.com
 func main() {
-
-	err := configs.GetConfig("Internal/configs/configs.json")
+	logger:=zerolog.New(os.Stdin).With().Timestamp().Logger()
+	err := configs.GetConfig("internal/configs/configs.json")
 	if err != nil {
-		log.Fatal("error getting configs")
+		logger.Err(err).Msg("config error")
+		return
 	}
-	fmt.Println(configs.AppSettings)
 	postgresOpen := fmt.Sprintf(
 		`host=%s
 			user=%s
@@ -41,26 +42,31 @@ func main() {
 	)
 	db, err := sqlx.Open("postgres", postgresOpen)
 	if err != nil {
-		log.Fatal(err)
+		logger.Err(err).Msg("error connecting to postgres")
+		return 
 	}
 
-	log.Println("successfully connected to postgres")
+	logger.Info().Msg("successfully connected to postgres")
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     configs.AppSettings.RedisParams.Address,
 		Password: os.Getenv("REDIS_PASS"),
 		DB:       configs.AppSettings.RedisParams.DB,
 	})
-	cache := repository.NewCache(rdb)
-	repository := repository.NewRepository(db, cache)
+	
+	
+	cache := repository.NewCache(rdb,logger)
+	repository := repository.NewRepository(db, cache,logger)
 	service := service.NewService(repository, cache)
 	controller := controller.NewController(service)
+	
 
 	if err = controller.RunServer(); err != nil {
-		log.Fatal(err)
+		logger.Error().Err(err).Msg("error while trying to run server")
 	}
 
 	if err = db.Close(); err != nil {
-		log.Fatal(err)
+		logger.Error().Err(err).Msg("error closing database")
+		return
 	}
 
 }

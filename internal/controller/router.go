@@ -9,13 +9,25 @@ import (
 
 func (ctrl *Controller) RegisterEndpoints() {
 
-	ctrl.router.GET("/users", ctrl.GetAllUsers)
-	ctrl.router.GET("/users/:id", ctrl.GetUserById)
-	ctrl.router.POST("/users", ctrl.CreateNewUser)
-	ctrl.router.PUT("/users/:id", ctrl.UpdateUserById)
-	ctrl.router.DELETE("/users/:id", ctrl.DeleteUserById)
+	{
+apiGroup:=ctrl.router.Group("/api",ctrl.checkUserAuthentication)
+	apiGroup.GET("/employees", ctrl.GetAllEmployees)
+	apiGroup.GET("/employees/:id", ctrl.GetEmployeeById)
+	apiGroup.POST("/employees", ctrl.CreateNewEmployee)
+	apiGroup.PUT("/employees/:id", ctrl.UpdateUserById)
+	apiGroup.DELETE("/employees/:id", ctrl.DeleteUserById)
+	}
+	
 	ctrl.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+{
+	authGroup:=ctrl.router.Group("/auth")
+	authGroup.POST("/sign-up",ctrl.SignUp)
+	authGroup.POST("/sign-in",ctrl.SignIn)
+	authGroup.GET("/refresh",ctrl.RefreshTokenPair)
+	authGroup.POST("/check",ctrl.checkToken)
 
+}
+	
 }
 func (ctrl *Controller) RunServer() error {
 	ctrl.RegisterEndpoints()

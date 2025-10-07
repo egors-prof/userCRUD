@@ -12,3 +12,14 @@ var (
 	ErrNegativeID         = errors.New("negative id err. id should positive")
 	ErrInvalidIDFormat    = errors.New("invalid user id format")
 )
+
+
+var(
+	ErrUserAlreadyExists=errors.New("user already exists")
+	ErrBindJson=errors.New("error binding json")
+	ErrCreatingUser=errors.New("error creating user")
+	ErrHashing=errors.New("error hashing")
+	ErrIncorrectUsernameOrPassword=errors.New("incorrect username or password")
+	ErrInvalidToken=errors.New("invalid token")
+	ErrSomethingWentWrong=errors.New("something went wrong")
+)

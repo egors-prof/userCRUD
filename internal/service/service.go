@@ -9,6 +9,6 @@ type Service struct {
 	cache contracts.CacheI
 }
 
-func NewService(repository contracts.ServiceI,cache contracts.CacheI) *Service {
+func NewService(repository contracts.RepositoryI,cache contracts.CacheI) *Service {
 	return &Service{repository: repository,cache: cache}
 }

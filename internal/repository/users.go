@@ -3,61 +3,52 @@ package repository
 import (
 	"CSR/internal/errs"
 	"CSR/internal/models"
-	"context"
-
-	// "encoding/json"
-
-	// "errors"
-	// "fmt"
-	
-	"time"
-	// "github.com/redis/go-redis/v9"
+	"database/sql"
+	"errors"
+	"fmt"
 )
 
-var ctx = context.Background()
-
-func (r *Repository) GetAllUsers() ([]models.User, error) {
-	users := []models.User{}
-	time.Sleep(10 * time.Second)
-	err := r.db.Select(&users, `select id,name,email,age from Users`)
-	if err != nil {
-		return nil, err
-	}
-	return users, nil
-}
-
-func (r *Repository) GetUserById(id int) (models.User, error) {
-	user:=models.User{}
-	err:=r.db.Get(&user, `select id,name,email,age from users where id=$1`,id)
+func (r*Repository)GetUserByUsername(userName string)(models.User,error){
+	user :=models.User{}
+	err:=r.db.Get(&user,`select *
+	from users where username =$1`,userName)
 	if user.Id==0{
 		return models.User{},errs.ErrUserNotFound
 	}
 	if err!=nil{
-		return models.User{},err
+		if errors.Is(err,sql.ErrNoRows){
+			r.repoLog.Error().Err(sql.ErrNoRows).Send()
+			return models.User{} ,errs.ErrUserNotFound
+		}
+
+		r.repoLog.Error().Err(err).Msg("unknown error")
+		return models.User{},fmt.Errorf("internal error occurred")
 	}
-	return user, err
+	return user,nil
 }
 
-func (r *Repository) CreateNewUser(user models.User) error {
-	_, err := r.db.Exec(`insert into users (name,email,age)values ($1,$2,$3)`, user.Name, user.Email, user.Age)
-	if err != nil {
-		return r.transferError(err)
+
+func (r *Repository) CreateNewUser(newUser models.SignUpRequest) error {
+	r.repoLog.Info().Any("newUser:",newUser).Send()
+	user,_:=r.GetUserByUsername(newUser.Username)
+	r.repoLog.Info().Any("user",user).Send()
+	if user.Id==0{
+		r.repoLog.Info().Any("status: ",user).Send()
+		_,err:=r.db.Exec(
+		`insert into users
+		(full_name, username,hash_pass) 
+		values 
+		($1,$2,$3)`,
+		newUser.FullName,
+		newUser.Username,
+		newUser.Password,
+		)
+		if err!=nil{
+			r.repoLog.Error().Err(err).Msg("error while inserting user")
+			return err
+		}
+		return nil 
 	}
-	return nil
+	return errs.ErrUserAlreadyExists
 }
 
-func (r *Repository) UpdateUserById(id int, user models.User) error {
-	_, err := r.db.Exec(`update users set name =$1,email=$2,age=$3 where id=$4`, user.Name, user.Email, user.Age, id)
-	if err != nil {
-		return r.transferError(err)
-	}
-	return nil
-}
-
-func (r *Repository) DeleteUserById(id int) error {
-	_, err := r.db.Exec(`delete from users where id =$1`, id)
-	if err != nil {
-		return r.transferError(err)
-	}
-	return nil
-}

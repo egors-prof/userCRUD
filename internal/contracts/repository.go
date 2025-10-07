@@ -1,11 +1,22 @@
 package contracts
 
-import "CSR/internal/models"
+import (
+	"CSR/internal/models"
+
+	
+
+
+)
+
 
 type RepositoryI interface {
-	GetAllUsers() ([]models.User, error)
-	GetUserById(id int) (models.User, error)
-	CreateNewUser(user models.User) error
-	UpdateUserById(id int, user models.User) error
-	DeleteUserById(id int) error
+	GetAllEmployees() ([]models.Employee, error)
+	GetEmployeeById(id int) (models.Employee, error)
+	CreateNewEmployee(employee models.EmployeeRequest) error
+	UpdateEmployeeById(id int, user models.EmployeeRequest) error
+	DeleteEmployeeById(id int) error
+
+	CreateNewUser(userRequest models.SignUpRequest)error
+	
+	GetUserByUsername(userName string)(models.User,error)
 }

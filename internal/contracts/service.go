@@ -1,11 +1,16 @@
 package contracts
 
 import "CSR/internal/models"
+
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
 type ServiceI interface {
-	GetAllUsers() ([]models.User, error)
-	GetUserById(id int) (models.User, error)
-	CreateNewUser(user models.User) error
-	UpdateUserById(id int, user models.User) error
-	DeleteUserById(id int) error
+	GetAllEmployees() ([]models.Employee, error)
+	GetEmployeeById(id int) (models.Employee, error)
+	CreateNewEmployee(emp models.EmployeeRequest) error
+	UpdateEmployeeById(id int, user models.EmployeeRequest) error
+	DeleteEmployeeById(id int) error
+
+	CreateNewUser(userRequest models.SignUpRequest)error
+	Authenticate(userRequest models.SignInRequest) (int ,error)
+	
 }

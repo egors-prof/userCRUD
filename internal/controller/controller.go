@@ -4,13 +4,16 @@ import (
 	"CSR/internal/contracts"
 	"CSR/internal/errs"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 type Controller struct {
 	service contracts.ServiceI
 	router  *gin.Engine
+	ctrlLogger zerolog.Logger
 }
 
 func NewController(service contracts.ServiceI) *Controller {
@@ -21,8 +24,15 @@ func (ctrl *Controller) handleError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, errs.ErrUserNotFound) || errors.Is(err, errs.ErrNotFound):
 		c.JSON(http.StatusNotFound, CommonError{Error: err.Error()})
-	case errors.Is(err, errs.ErrInvalidUserID) || errors.Is(err, errs.ErrInvalidRequestBody) || errors.Is(err, errs.ErrNegativeID) || errors.Is(err, errs.ErrInvalidIDFormat):
+	case errors.Is(err, errs.ErrInvalidUserID)||
+	errors.Is(err,errs.ErrBindJson)||
+	errors.Is(err,errs.ErrUserAlreadyExists)||
+	errors.Is(err, errs.ErrInvalidRequestBody) || 
+	errors.Is(err, errs.ErrNegativeID) || 
+	errors.Is(err, errs.ErrInvalidIDFormat):
 		c.JSON(http.StatusBadRequest, CommonError{Error: err.Error()})
+	case errors.Is(err,errs.ErrIncorrectUsernameOrPassword)||errors.Is(err,errs.ErrInvalidToken):
+		c.JSON(http.StatusUnauthorized,CommonError{Error: err.Error()})	
 	case errors.Is(err, errs.ErrInvalidFieldValue) || errors.Is(err, errs.ErrInvalidUserName):
 		c.JSON(http.StatusUnprocessableEntity, CommonError{Error: err.Error()})
 

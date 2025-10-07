@@ -3,6 +3,6 @@ package controller
 type CommonError struct {
 	Error string `json:"error"`
 }
-type DefaultResponse struct {
+type CommonResponse struct {
 	Info string `json:"info"`
 }

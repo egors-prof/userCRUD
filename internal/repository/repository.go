@@ -4,26 +4,28 @@ import (
 	"CSR/internal/errs"
 	"database/sql"
 	"errors"
+
 	"github.com/jmoiron/sqlx"
-	"log"
+	"github.com/rs/zerolog"
 )
 
 type Repository struct {
 	db    *sqlx.DB
 	Cache *Cache
+	repoLog zerolog.Logger
 }
 
-func NewRepository(db *sqlx.DB, cache *Cache) *Repository {
+func NewRepository(db *sqlx.DB, cache *Cache,logger zerolog.Logger) *Repository {
 	return &Repository{
 		db: db,
 		Cache:cache,
+		repoLog:logger,
 	}
 }
 
 func (r *Repository) transferError(err error) error {
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		log.Println(err)
 		return errs.ErrNotFound
 	default:
 		return err
