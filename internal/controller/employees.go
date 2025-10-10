@@ -14,26 +14,27 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// GetAllUsers
+// GetAllEmployees
 // @Summary getting employees
 // @Description getting list of all employees
 // @Tags Employees
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} models.Employee
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
 // @Router /api/employees [get]
 func (ctrl *Controller) GetAllEmployees(c *gin.Context) {
-	logger:=zerolog.New(os.Stdout).With().Str("func_name","controller.GetAllEmployees").Logger()
-	userID:=c.GetInt(userIDCtx)
-	if userID==0{
-		c.JSON(http.StatusBadRequest,CommonError{Error: "invalid user id in context"})
+	logger := zerolog.New(os.Stdout).With().Str("func_name", "controller.GetAllEmployees").Logger()
+	userID := c.GetInt(userIDCtx)
+	if userID == 0 {
+		c.JSON(http.StatusBadRequest, CommonError{Error: "invalid user id in context"})
 	}
-	logger.Debug().Int("user_id",userID).Msg("GetUser")
+	logger.Debug().Int("user_id", userID).Msg("GetUser")
 	emps, err := ctrl.service.GetAllEmployees()
 	if err != nil {
-		ctrl.handleError(c,err)
+		ctrl.handleError(c, err)
 		ctrl.ctrlLogger.Error().Err(err).Send()
 		return
 	}
@@ -41,25 +42,26 @@ func (ctrl *Controller) GetAllEmployees(c *gin.Context) {
 
 }
 
-// GetUserById
-// @Summary getting user
-// @Description getting a user by id
-// @Tags Users
+// GetEmployeeById
+// @Summary getting employee
+// @Description getting an employee by id
+// @Tags Employees
 // @Produce json
-// @Param id path int true "user id"
+// @Security BearerAuth
+// @Param id path int true "employee id"
 // @Success 200 {object} models.Employee
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users/{id} [get]
+// @Router /api/employees/{id} [get]
 func (ctrl *Controller) GetEmployeeById(c *gin.Context) {
-	logger:=zerolog.New(os.Stdout).With().Str("func_name","controller.GetEmployeeById").Logger()
-	userID:=c.GetInt(userIDCtx)
-	log.Println("userID context: ",userID)
-	if userID==0{
-		c.JSON(http.StatusBadRequest,CommonError{Error: "invalid user id in context"})
+	logger := zerolog.New(os.Stdout).With().Str("func_name", "controller.GetEmployeeById").Logger()
+	userID := c.GetInt(userIDCtx)
+	log.Println("userID context: ", userID)
+	if userID == 0 {
+		c.JSON(http.StatusBadRequest, CommonError{Error: "invalid user id in context"})
 	}
-	logger.Debug().Int("user_id",userID).Msg("GetUser")
+	logger.Debug().Int("user_id", userID).Msg("GetUser")
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 1 {
@@ -76,19 +78,20 @@ func (ctrl *Controller) GetEmployeeById(c *gin.Context) {
 	c.JSON(200, user)
 }
 
-// CreateNewUser
+// CreateNewEmployee
 // @Summary creating
-// @Description creating new user
-// @Tags Users
+// @Description creating new employee
+// @Tags Employees
 // @Produce json
 // @Consume json
-// @Param request_body body CreateUserRequest true "user info"
-// @Success 201 {object} DefaultResponse
+// @Security BearerAuth
+// @Param request_body body models.EmployeeRequest true "user info"
+// @Success 201 {object} CommonResponse
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 422 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users [post]
+// @Router /api/employees [post]
 func (ctrl *Controller) CreateNewEmployee(c *gin.Context) {
 	var newEmp models.EmployeeRequest
 	err := c.BindJSON(&newEmp)
@@ -100,7 +103,7 @@ func (ctrl *Controller) CreateNewEmployee(c *gin.Context) {
 	if newEmp.Age == 0 || newEmp.Name == "" || newEmp.Email == "" {
 		ctrl.handleError(c, errs.ErrInvalidFieldValue)
 		ctrl.ctrlLogger.Error().Err(err).Send()
-		return 
+		return
 	}
 	err = ctrl.service.CreateNewEmployee(newEmp)
 	if err != nil {
@@ -115,17 +118,18 @@ func (ctrl *Controller) CreateNewEmployee(c *gin.Context) {
 // UpdateUserById
 // @Summary updating
 // @Description updating user by id
-// @Tags Users
+// @Tags Employees
 // @Produce json
 // @Consume json
+// @Security BearerAuth
 // @Param id path int true "user id"
-// @Param request_body body CreateUserRequest true "user info"
-// @Success 200 {object} DefaultResponse
+// @Param request_body body models.EmployeeRequest true "user info"
+// @Success 200 {object} CommonResponse
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 422 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users/{id} [put]
+// @Router /api/employees/{id} [put]
 func (ctrl *Controller) UpdateUserById(c *gin.Context) {
 	var empRequest models.EmployeeRequest
 	if err := c.BindJSON(&empRequest); err != nil {
@@ -133,9 +137,9 @@ func (ctrl *Controller) UpdateUserById(c *gin.Context) {
 		ctrl.ctrlLogger.Error().Err(err).Send()
 		return
 	}
-	
-	if empRequest.Age==0&&empRequest.Email==""&&empRequest.Name==""{
-		ctrl.handleError(c,errs.ErrInvalidRequestBody)
+
+	if empRequest.Age == 0 && empRequest.Email == "" && empRequest.Name == "" {
+		ctrl.handleError(c, errs.ErrInvalidRequestBody)
 		ctrl.ctrlLogger.Error().Err(errs.ErrInvalidRequestBody).Send()
 		return
 	}
@@ -156,18 +160,19 @@ func (ctrl *Controller) UpdateUserById(c *gin.Context) {
 
 }
 
-// DeleteUserById
-// @Summary deleting
-// @Description delete user by id
-// @Tags Users
+// DeleteEmployeeById
+// @Summary deleting emp
+// @Description delete employee by id
+// @Tags Employees
 // @Produce json
-// @Param id path int true "user id"
-// @Success 200 {object} DefaultResponse
+// @Security BearerAuth
+// @Param id path int true "emp id"
+// @Success 200 {object} CommonResponse
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
 // @Failure 500 {object} CommonError
-// @Router /users/{id} [delete]
-func (ctrl *Controller) DeleteUserById(c *gin.Context) {
+// @Router /api/employees/{id} [delete]
+func (ctrl *Controller) DeleteEmployeeById(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -188,6 +193,6 @@ func (ctrl *Controller) DeleteUserById(c *gin.Context) {
 		return
 
 	}
-	c.JSON(http.StatusOK, CommonResponse{Info: "user is successfully deleted"})
+	c.JSON(http.StatusOK, CommonResponse{Info: "employee is successfully deleted"})
 
 }

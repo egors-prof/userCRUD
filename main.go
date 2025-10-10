@@ -2,11 +2,11 @@ package main
 
 import (
 	"CSR/internal/configs"
+	"CSR/internal/controller"
 	"CSR/internal/repository"
 	"CSR/internal/service"
 	"context"
 	"fmt"
-	"CSR/internal/controller"
 
 	"os"
 
@@ -22,8 +22,11 @@ var ctx = context.Background()
 // @contact.name onlineshop api
 // @contact.url http://test.com
 // @contact.email test@test.com
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
-	logger:=zerolog.New(os.Stdin).With().Timestamp().Logger()
+	logger := zerolog.New(os.Stdin).With().Timestamp().Logger()
 	err := configs.GetConfig("internal/configs/configs.json")
 	if err != nil {
 		logger.Err(err).Msg("config error")
@@ -43,7 +46,7 @@ func main() {
 	db, err := sqlx.Open("postgres", postgresOpen)
 	if err != nil {
 		logger.Err(err).Msg("error connecting to postgres")
-		return 
+		return
 	}
 
 	logger.Info().Msg("successfully connected to postgres")
@@ -52,13 +55,11 @@ func main() {
 		Password: os.Getenv("REDIS_PASS"),
 		DB:       configs.AppSettings.RedisParams.DB,
 	})
-	
-	
-	cache := repository.NewCache(rdb,logger)
-	repository := repository.NewRepository(db, cache,logger)
+
+	cache := repository.NewCache(rdb, logger)
+	repository := repository.NewRepository(db, cache, logger)
 	service := service.NewService(repository, cache)
 	controller := controller.NewController(service)
-	
 
 	if err = controller.RunServer(); err != nil {
 		logger.Error().Err(err).Msg("error while trying to run server")

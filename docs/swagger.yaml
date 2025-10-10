@@ -1,24 +1,15 @@
 definitions:
-  Controller.CommonError:
+  controller.CommonError:
     properties:
       error:
         type: string
     type: object
-  Controller.CreateUserRequest:
-    properties:
-      age:
-        type: integer
-      email:
-        type: string
-      name:
-        type: string
-    type: object
-  Controller.DefaultResponse:
+  controller.CommonResponse:
     properties:
       info:
         type: string
     type: object
-  models.User:
+  models.Employee:
     properties:
       age:
         type: integer
@@ -29,6 +20,31 @@ definitions:
       name:
         type: string
     type: object
+  models.EmployeeRequest:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  models.SignUpRequest:
+    properties:
+      full_name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.TokenPairResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
 info:
   contact:
     email: test@test.com
@@ -36,9 +52,9 @@ info:
     url: http://test.com
   title: onlineshop
 paths:
-  /users:
+  /api/employees:
     get:
-      description: getting list of all users
+      description: getting list of all employees
       produces:
       - application/json
       responses:
@@ -46,63 +62,67 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.User'
+              $ref: '#/definitions/models.Employee'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Controller.CommonError'
-      summary: getting users
+            $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
+      summary: getting employees
       tags:
-      - Users
+      - Employees
     post:
-      description: creating new user
+      description: creating new employee
       parameters:
       - description: user info
         in: body
         name: request_body
         required: true
         schema:
-          $ref: '#/definitions/Controller.CreateUserRequest'
+          $ref: '#/definitions/models.EmployeeRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/Controller.DefaultResponse'
+            $ref: '#/definitions/controller.CommonResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: creating
       tags:
-      - Users
-  /users/{id}:
+      - Employees
+  /api/employees/{id}:
     delete:
-      description: delete user by id
+      description: delete employee by id
       parameters:
-      - description: user id
+      - description: emp id
         in: path
         name: id
         required: true
@@ -113,26 +133,28 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Controller.DefaultResponse'
+            $ref: '#/definitions/controller.CommonResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Controller.CommonError'
-      summary: deleting
+            $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
+      summary: deleting emp
       tags:
-      - Users
+      - Employees
     get:
-      description: getting a user by id
+      description: getting an employee by id
       parameters:
-      - description: user id
+      - description: employee id
         in: path
         name: id
         required: true
@@ -143,22 +165,24 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.Employee'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Controller.CommonError'
-      summary: getting user
+            $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
+      summary: getting employee
       tags:
-      - Users
+      - Employees
     put:
       description: updating user by id
       parameters:
@@ -172,31 +196,128 @@ paths:
         name: request_body
         required: true
         schema:
-          $ref: '#/definitions/Controller.CreateUserRequest'
+          $ref: '#/definitions/models.EmployeeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Controller.DefaultResponse'
+            $ref: '#/definitions/controller.CommonResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Controller.CommonError'
+            $ref: '#/definitions/controller.CommonError'
+      security:
+      - BearerAuth: []
       summary: updating
       tags:
-      - Users
+      - Employees
+  /auth/refresh:
+    get:
+      description: refresh token pair
+      parameters:
+      - description: insert refresh token
+        in: header
+        name: X-Refresh-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenPairResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+      summary: Refresh token pair
+      tags:
+      - Auth
+  /auth/sign-in:
+    post:
+      description: sign in account
+      parameters:
+      - description: sign in credentials
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenPairResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+      summary: Sign in
+      tags:
+      - Auth
+  /auth/sign-up:
+    post:
+      description: create new account
+      parameters:
+      - description: Information about new account
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.CommonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.CommonError'
+      summary: Registration
+      tags:
+      - Auth
 swagger: "2.0"
