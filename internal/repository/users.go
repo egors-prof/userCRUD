@@ -15,6 +15,7 @@ func (r *Repository) GetUserByUsername(userName string) (models.User, error) {
 	user := models.User{}
 	err := r.db.Get(&user, `select *
 	from users where username =$1`, userName)
+	logger.Debug().Any("user",user).Send()
 	if user.Id == 0 {
 		return models.User{}, errs.ErrUserNotFound
 	}
@@ -33,6 +34,8 @@ func (r *Repository) GetUserByUsername(userName string) (models.User, error) {
 func (r *Repository) CreateNewUser(newUser models.SignUpRequest) error {
 	logger := zerolog.New(os.Stdout).With().Timestamp().Str("func_name", "repository.GetUserByUsername").Logger()
 	user, _ := r.GetUserByUsername(newUser.Username)
+	logger.Info().Any("newUser",newUser).Send()
+	logger.Info().Any("user",user).Send()
 	if user.Id == 0 {
 		_, err := r.db.Exec(
 			`insert into users

@@ -3,7 +3,7 @@ create table if not exists users(
     full_name VARCHAR NOT NULL,
     username VARCHAR NOT NULL,
     hash_pass VARCHAR NOT NULL,
-    created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ,
-    role VARCHAR
+    created_at TIMESTAMPTZ DEFAULT CURRENT TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT TIMESTAMP,
+    role VARCHAR default 'USER'
 );

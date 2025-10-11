@@ -56,7 +56,7 @@ func main() {
 		DB:       configs.AppSettings.RedisParams.DB,
 	})
 
-	cache := repository.NewCache(rdb, logger)
+	cache := repository.NewCache(rdb)
 	repository := repository.NewRepository(db, cache)
 	service := service.NewService(repository, cache)
 	controller := controller.NewController(service)
