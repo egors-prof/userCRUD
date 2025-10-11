@@ -57,7 +57,7 @@ func main() {
 	})
 
 	cache := repository.NewCache(rdb, logger)
-	repository := repository.NewRepository(db, cache, logger)
+	repository := repository.NewRepository(db, cache)
 	service := service.NewService(repository, cache)
 	controller := controller.NewController(service)
 

@@ -5,7 +5,8 @@ import (
 	"CSR/internal/models"
 	"CSR/internal/pkg"
 	"fmt"
-	"log"
+	"github.com/rs/zerolog"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -57,7 +58,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		ctrl.handleError(c, errs.ErrInvalidRequestBody)
 		return
 	}
-	userId,userRole,err := ctrl.service.Authenticate(user)
+	userId, userRole, err := ctrl.service.Authenticate(user)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, CommonError{
@@ -65,7 +66,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		})
 		return
 	}
-	accessToken, refreshToken, err := ctrl.generateNewTokenPair(userId,userRole)
+	accessToken, refreshToken, err := ctrl.generateNewTokenPair(userId, userRole)
 	if err != nil {
 		ctrl.handleError(c, err)
 	}
@@ -88,22 +89,23 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 // @Failure 500 {object} CommonError
 // @Router /auth/refresh [get]
 func (ctrl *Controller) RefreshTokenPair(c *gin.Context) {
+	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
+	logger.Info().Str("func_name", "RefreshTokenPair").Send()
 	token, err := ctrl.extractTokenFromHeader(c, refreshTokenHeader)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: err.Error()})
 		return
 	}
-	userID, isRefresh,role, err := pkg.ParseToken(token)
+	userID, isRefresh, role, err := pkg.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: err.Error()})
 		return
 	}
-	log.Println("token: ", token, "isRefresh controller: ", isRefresh)
 	if !isRefresh {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: "inappropriate token"})
 		return
 	} else {
-		accessToken, refreshToken, err := ctrl.generateNewTokenPair(userID,role)
+		accessToken, refreshToken, err := ctrl.generateNewTokenPair(userID, role)
 		if err != nil {
 			ctrl.handleError(c, err)
 		}

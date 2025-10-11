@@ -6,20 +6,17 @@ import (
 	"errors"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/rs/zerolog"
 )
 
 type Repository struct {
 	db    *sqlx.DB
 	Cache *Cache
-	repoLog zerolog.Logger
 }
 
-func NewRepository(db *sqlx.DB, cache *Cache,logger zerolog.Logger) *Repository {
+func NewRepository(db *sqlx.DB, cache *Cache) *Repository {
 	return &Repository{
-		db: db,
-		Cache:cache,
-		repoLog:logger,
+		db:    db,
+		Cache: cache,
 	}
 }
 

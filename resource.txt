@@ -7,3 +7,6 @@ create table users(
     updated_at TIMESTAMPTZ,
     role VARCHAR
 );
+
+
+migrate -database "mysql://user:pass@tcp(host:port)/dbname" -path "file://path/to/migrations" force 20230719122330

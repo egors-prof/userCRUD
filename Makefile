@@ -18,7 +18,7 @@ hello:
 
 migrate-create:
 	@read -p "Enter migration name: " name; \
-	migrate create -ext sql -dir ./migrations -digits 4 $name
+	migrate create -ext sql -dir ./migrations  $(name)
 
 
 

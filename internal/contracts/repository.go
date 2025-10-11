@@ -2,12 +2,7 @@ package contracts
 
 import (
 	"CSR/internal/models"
-
-	
-
-
 )
-
 
 type RepositoryI interface {
 	GetAllEmployees() ([]models.Employee, error)
@@ -15,8 +10,6 @@ type RepositoryI interface {
 	CreateNewEmployee(employee models.EmployeeRequest) error
 	UpdateEmployeeById(id int, user models.EmployeeRequest) error
 	DeleteEmployeeById(id int) error
-
-	CreateNewUser(userRequest models.SignUpRequest)error
-	
-	GetUserByUsername(userName string)(models.User,error)
+	CreateNewUser(userRequest models.SignUpRequest) error
+	GetUserByUsername(userName string) (models.User, error)
 }

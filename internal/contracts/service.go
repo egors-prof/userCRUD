@@ -9,8 +9,6 @@ type ServiceI interface {
 	CreateNewEmployee(emp models.EmployeeRequest) error
 	UpdateEmployeeById(id int, user models.EmployeeRequest) error
 	DeleteEmployeeById(id int) error
-
-	CreateNewUser(userRequest models.SignUpRequest)error
-	Authenticate(userRequest models.SignInRequest)(int, models.Role ,error)
-	
+	CreateNewUser(userRequest models.SignUpRequest) error
+	Authenticate(userRequest models.SignInRequest) (int, models.Role, error)
 }
