@@ -9,8 +9,8 @@ POSTGRES_PORT=5432
 POSTGRES_DATABASE=postgres
 
 
-DB_URL=postrges://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DATABASE)?sslmode=disable
-
+DB_URL=postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DATABASE)?sslmode=disable
+#url=postgres://postgres:12345@localhost:5432/postgres?sslmode=disable
 
 hello:
 	echo "hello ${name}"
@@ -18,4 +18,20 @@ hello:
 
 migrate-create:
 	@read -p "Enter migration name: " name; \
-	$(MIGRATE_BIN) create -ext sql -dir $(MIGRATIONS_DIR) $$name
+	migrate create -ext sql -dir ./migrations -digits 4 $name
+
+
+
+version:
+	migrate -database "$(DB_URL)" -path ./migrations version
+migrate-up:
+	migrate -path ./migrations -database "$(DB_URL)" up
+
+migrate-down:
+	migrate -path ./migrations -database "$(DB_URL)" down 1
+
+migrate-reset:
+	migrate -path ./migrations -database "$(DB_URL)" down -all
+
+
+
