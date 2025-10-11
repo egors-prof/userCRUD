@@ -43,7 +43,7 @@ func (ctrl *Controller) SignUp(c *gin.Context) {
 // @Tags Auth
 // @Consume json
 // @Produce json
-// @Param request_body body models.SignUpRequest true "sign in credentials"
+// @Param request_body body models.SignInRequest true "sign in credentials"
 // @Success 200 {object} models.TokenPairResponse
 // @Failure 400 {object} CommonError
 // @Failure 404 {object} CommonError
@@ -57,7 +57,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		ctrl.handleError(c, errs.ErrInvalidRequestBody)
 		return
 	}
-	userId, err := ctrl.service.Authenticate(user)
+	userId,userRole,err := ctrl.service.Authenticate(user)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, CommonError{
@@ -65,7 +65,7 @@ func (ctrl *Controller) SignIn(c *gin.Context) {
 		})
 		return
 	}
-	accessToken, refreshToken, err := ctrl.generateNewTokenPair(userId)
+	accessToken, refreshToken, err := ctrl.generateNewTokenPair(userId,userRole)
 	if err != nil {
 		ctrl.handleError(c, err)
 	}
@@ -93,7 +93,7 @@ func (ctrl *Controller) RefreshTokenPair(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: err.Error()})
 		return
 	}
-	userID, isRefresh, err := pkg.ParseToken(token)
+	userID, isRefresh,role, err := pkg.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: err.Error()})
 		return
@@ -103,7 +103,7 @@ func (ctrl *Controller) RefreshTokenPair(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, CommonError{Error: "inappropriate token"})
 		return
 	} else {
-		accessToken, refreshToken, err := ctrl.generateNewTokenPair(userID)
+		accessToken, refreshToken, err := ctrl.generateNewTokenPair(userID,role)
 		if err != nil {
 			ctrl.handleError(c, err)
 		}

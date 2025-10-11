@@ -11,6 +11,6 @@ type ServiceI interface {
 	DeleteEmployeeById(id int) error
 
 	CreateNewUser(userRequest models.SignUpRequest)error
-	Authenticate(userRequest models.SignInRequest) (int ,error)
+	Authenticate(userRequest models.SignInRequest)(int, models.Role ,error)
 	
 }

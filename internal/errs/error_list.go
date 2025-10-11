@@ -22,4 +22,5 @@ var(
 	ErrIncorrectUsernameOrPassword=errors.New("incorrect username or password")
 	ErrInvalidToken=errors.New("invalid token")
 	ErrSomethingWentWrong=errors.New("something went wrong")
+	ErrAccessDenied=errors.New("access denied")
 )

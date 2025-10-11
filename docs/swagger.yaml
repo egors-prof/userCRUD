@@ -29,6 +29,13 @@ definitions:
       name:
         type: string
     type: object
+  models.SignInRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.SignUpRequest:
     properties:
       full_name:
@@ -265,7 +272,7 @@ paths:
         name: request_body
         required: true
         schema:
-          $ref: '#/definitions/models.SignUpRequest'
+          $ref: '#/definitions/models.SignInRequest'
       produces:
       - application/json
       responses:
@@ -320,4 +327,9 @@ paths:
       summary: Registration
       tags:
       - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -3,6 +3,7 @@ package controller
 import (
 	"CSR/internal/configs"
 	"CSR/internal/pkg"
+	"CSR/internal/models"
 	"errors"
 
 	"strings"
@@ -25,12 +26,12 @@ func (ctrl *Controller)extractTokenFromHeader(c*gin.Context,headerKey string)(st
 }
 
 
-func(ctrl*Controller)generateNewTokenPair(userId int)(string,string,error){
-	accessToken,err:=pkg.GenerateToken(userId,configs.AppSettings.AuthParams.AccessTokenTtl,false)
+func(ctrl*Controller)generateNewTokenPair(userId int,userRole models.Role)(string,string,error){
+	accessToken,err:=pkg.GenerateToken(userId,configs.AppSettings.AuthParams.AccessTokenTtl,false,userRole)
 	if err!=nil{
 		return "","",nil
 	}
-	refreshToken,err:=pkg.GenerateToken(userId,configs.AppSettings.AuthParams.RefreshTokenTtl,true)
+	refreshToken,err:=pkg.GenerateToken(userId,configs.AppSettings.AuthParams.RefreshTokenTtl,true,userRole)
 	if err!=nil{
 		return "","",nil
 	}

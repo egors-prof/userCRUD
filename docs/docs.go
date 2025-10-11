@@ -354,7 +354,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SignUpRequest"
+                            "$ref": "#/definitions/models.SignInRequest"
                         }
                     }
                 ],
@@ -484,6 +484,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SignInRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SignUpRequest": {
             "type": "object",
             "properties": {
@@ -508,6 +519,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

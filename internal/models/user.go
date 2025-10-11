@@ -7,10 +7,16 @@ type User struct {
 	FullName string `db:"full_name" json:"full_name"`
 	Username string `db:"username" json:"username"`
 	Password string `db:"hash_pass" json :"hash_pass"`
+	Role Role `json:"role" db:"role"`
 	CreatedAt time.Time `db:"created_at" json :"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json :"updated_at"`
 }
 
+type Role string
+const(
+	RoleUser="USER"
+	RoleAdmin="ADMIN"
+)
 
 type SignInRequest struct{
 	UserName string `db:"username" json:"username"`
@@ -21,6 +27,7 @@ type SignUpRequest struct{
 	FullName string `db:"full_name" json:"full_name"`
 	Username string `db:"username" json:"username"`
 	Password string `db:"hash_pass" json :"hash_pass"`
+	
 }
 type TokenPairResponse struct {
 	AccessToken string `json:"access_token"`

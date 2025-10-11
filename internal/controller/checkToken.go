@@ -18,7 +18,7 @@ func (ctrl Controller) checkToken(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError,CommonError{Error:err.Error()})
 		return 
 	}
-	id,isRefresh,err:=pkg.ParseToken(token.TokenString)
+	id,isRefresh,role,err:=pkg.ParseToken(token.TokenString)
 	if err!=nil{
 		c.AbortWithStatusJSON(http.StatusInternalServerError,CommonError{Error:err.Error()})
 		return 
@@ -26,6 +26,7 @@ func (ctrl Controller) checkToken(c *gin.Context) {
 	c.JSON(http.StatusOK,gin.H{
 		"id":id,
 		"is_refresh":isRefresh,
+		"role":role,
 	})
 
 

@@ -3,6 +3,7 @@ package controller
 import (
 	_ "CSR/docs"
 	"CSR/internal/configs"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -14,9 +15,9 @@ func (ctrl *Controller) RegisterEndpoints() {
 		apiGroup := ctrl.router.Group("/api", ctrl.checkUserAuthentication)
 		apiGroup.GET("/employees", ctrl.GetAllEmployees)
 		apiGroup.GET("/employees/:id", ctrl.GetEmployeeById)
-		apiGroup.POST("/employees", ctrl.CreateNewEmployee)
-		apiGroup.PUT("/employees/:id", ctrl.UpdateUserById)
-		apiGroup.DELETE("/employees/:id", ctrl.DeleteEmployeeById)
+		apiGroup.POST("/employees", ctrl.CheckIsAdmin, ctrl.CreateNewEmployee)
+		apiGroup.PUT("/employees/:id", ctrl.CheckIsAdmin, ctrl.UpdateUserById)
+		apiGroup.DELETE("/employees/:id", ctrl.CheckIsAdmin, ctrl.DeleteEmployeeById)
 	}
 
 	{
